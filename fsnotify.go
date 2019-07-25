@@ -30,6 +30,7 @@ const (
 	Rename
 	Chmod
 	CloseWrite
+	MovedTo
 )
 
 func (op Op) String() string {
@@ -53,6 +54,9 @@ func (op Op) String() string {
 	}
 	if op&CloseWrite == CloseWrite {
 		buffer.WriteString("|CLOSE_WRITE")
+	}
+	if op&MovedTo == MovedTo {
+		buffer.WriteString("|MOVED_TO")
 	}
 	if buffer.Len() == 0 {
 		return ""

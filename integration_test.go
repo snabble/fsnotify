@@ -647,7 +647,7 @@ func TestFsnotifyRename(t *testing.T) {
 	os.Remove(testFileRenamed)
 }
 
-func TestFsnotifyRenameToCreate(t *testing.T) {
+func TestFsnotifyRenameMovedTo(t *testing.T) {
 	watcher := newWatcher(t)
 
 	// Create directory to watch
@@ -672,14 +672,14 @@ func TestFsnotifyRenameToCreate(t *testing.T) {
 
 	// Receive events on the event channel on a separate goroutine
 	eventstream := watcher.Events
-	var createReceived counter
+	var movedToReceived counter
 	done := make(chan bool)
 	go func() {
 		for event := range eventstream {
 			// Only count relevant events
 			if event.Name == filepath.Clean(testDir) || event.Name == filepath.Clean(testFile) || event.Name == filepath.Clean(testFileRenamed) {
-				if event.Op&Create == Create {
-					createReceived.increment()
+				if event.Op&MovedTo == MovedTo {
+					movedToReceived.increment()
 				}
 				t.Logf("event received: %s", event)
 			} else {
@@ -705,7 +705,7 @@ func TestFsnotifyRenameToCreate(t *testing.T) {
 
 	// We expect this event to be received almost immediately, but let's wait 500 ms to be sure
 	time.Sleep(500 * time.Millisecond)
-	if createReceived.value() == 0 {
+	if movedToReceived.value() == 0 {
 		t.Fatal("fsnotify create events have not been received after 500 ms")
 	}
 
